@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.log
+*.csv
+models/*.h5
+data/images/*.jpg
+data/failed/*.jpg
+data/exports/
+.vscode/

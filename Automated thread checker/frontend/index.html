@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automated Thread Checking System ADVANCED</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css?v=20240327" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="forge-glow forge-glow-1"></div>
+  <div class="forge-glow forge-glow-2"></div>
+  
+  <div class="banner">
+    <div class="banner-content">
+      <span class="version-tag">v2.0 ADVANCED</span>
+      <h3>AI-Powered Thread Inspection | Mobile Camera | Batch Processing</h3>
+    </div>
+  </div>
+
+  <main class="layout">
+    <section class="hero card reveal">
+      <h1>Automated Thread Checking System</h1>
+      <p>AI + Computer Vision + FastAPI Quality Inspection (v2.0 Advanced)</p>
+      <div class="hero-stats">
+        <div>
+          <span>Total</span>
+          <strong id="totalCount">0</strong>
+        </div>
+        <div>
+          <span>Pass %</span>
+          <strong id="passPct">0</strong>
+        </div>
+        <div>
+          <span>Fail %</span>
+          <strong id="failPct">0</strong>
+        </div>
+        <div>
+          <span>Avg Time</span>
+          <strong id="avgTime">0ms</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- CAMERA SECTION -->
+    <section class="camera card reveal">
+      <div class="section-header">
+        <h2>Camera & Capture</h2>
+        <span class="tag">Real-time</span>
+      </div>
+      
+      <div class="camera-controls">
+        <div class="camera-select-group">
+          <label>Camera Source
+            <select id="cameraSourceSelect">
+              <option value="0">Camera 0 (Default Webcam)</option>
+              <option value="1">Camera 1</option>
+              <option value="2">Camera 2</option>
+              <option value="custom">Custom IP Camera</option>
+            </select>
+          </label>
+          <input id="customCameraUrl" type="text" placeholder="http://192.168.1.100:8080/video" style="display:none; margin-top: 8px;" />
+          <button id="scanCamerasBtn" class="btn-small">Scan Cameras</button>
+          <button id="testCameraBtn" class="btn-small">Test Camera</button>
+          <button id="toggleCameraBtn" class="btn-small accent">Turn Camera Off</button>
+        </div>
+
+        <div id="cameraStatus" class="camera-status">
+          <span class="status-dot"></span> Camera: <span id="cameraStatusText">Connecting...</span>
+        </div>
+      </div>
+
+      <div class="viewer-wrap">
+        <img id="liveFeed" alt="Live camera feed" />
+      </div>
+
+      <div id="qualityIndicator" class="quality-indicator" style="display: none;">
+        <div class="quality-bar">
+          <div id="qualityBar" class="quality-fill"></div>
+        </div>
+        <div class="quality-text">
+          <span id="qualityScore">--</span>
+          <span id="qualityRecommendation">--</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="captureBtn">📸 Capture Frame</button>
+        <button id="analyzeBtn" class="accent">🔍 Analyze</button>
+        <button id="qualityCheckBtn">✓ Check Quality</button>
+        <button id="batchUploadBtn">📂 Batch Upload</button>
+        <button id="autoBtn">⚙ Auto Inspect: OFF</button>
+      </div>
+      <div id="statusLine">System ready. v2.0 Advanced mode.</div>
+    </section>
+
+    <!-- RESULTS SECTION -->
+    <section class="results card reveal">
+      <div class="section-header">
+        <h2>Inspection Result</h2>
+        <span id="finalBadge" class="badge neutral">NO DATA</span>
+      </div>
+      <div class="result-grid">
+        <div><label>Thread Type</label><strong id="threadTypeValue">-</strong></div>
+        <div><label>Pitch (mm)</label><strong id="pitchValue">-</strong></div>
+        <div><label>Diameter (mm)</label><strong id="diameterValue">-</strong></div>
+        <div><label>AI Result</label><strong id="aiValue">-</strong></div>
+        <div><label>Rule Result</label><strong id="ruleValue">-</strong></div>
+        <div><label>Time (ms)</label><strong id="timeValue">-</strong></div>
+      </div>
+
+        <div id="qualityResultBox" style="display:none; margin-top: 16px; padding: 14px; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; background: rgba(255,255,255,0.03);">
+        <strong>Image Quality Analysis:</strong>
+        <div id="qualityDetails"></div>
+      </div>
+
+      <div class="overlay-box">
+        <img id="overlayPreview" alt="Analyzed frame" />
+      </div>
+    </section>
+
+    <!-- BATCH PROCESSING SECTION -->
+    <section class="batch-processing card reveal">
+      <div class="section-header">
+        <h2>Batch Processing</h2>
+        <span class="tag">Advanced</span>
+      </div>
+      
+      <input id="batchFilesInput" type="file" multiple accept="image/*" style="display:none;" />
+      
+      <div class="batch-controls">
+        <button id="selectBatchFilesBtn" class="btn-large">Select Images for Batch Processing</button>
+        <div id="batchFilesList" style="margin-top: 10px; max-height: 150px; overflow-y: auto;">
+          <div class="batch-files-head">
+            <small id="batchFilesCount">No files selected</small>
+            <button id="clearBatchFilesBtn" class="btn-small" type="button">Clear All</button>
+          </div>
+          <div id="batchPreviewGrid" class="batch-preview-grid" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="batch-settings">
+        <label>Thread Type (Batch)
+          <select id="batchThreadType">
+            <option value="M8">M8</option>
+            <option value="M10" selected>M10</option>
+            <option value="M12">M12</option>
+          </select>
+        </label>
+        <label>Tolerance % (Batch)
+          <input id="batchTolerance" type="number" min="0" max="100" step="0.1" value="8" />
+        </label>
+        <button id="processBatchBtn" class="accent">Process Batch</button>
+      </div>
+
+      <div id="batchProgress" style="display:none; margin-top: 10px;">
+        <div class="progress-bar">
+          <div id="batchProgressFill" style="width: 0%; height: 100%;"></div>
+        </div>
+        <small id="batchProgressText">Processing...</small>
+      </div>
+
+      <div id="batchResults" style="display:none; margin-top: 10px; padding: 10px; background: #f5f5f5; border-radius: 8px;">
+        <strong>Batch Results Summary:</strong>
+        <div id="batchResultsDetails"></div>
+      </div>
+    </section>
+
+    <!-- SETTINGS SECTION -->
+    <section class="settings card reveal">
+      <div class="section-header">
+        <h2>Inspection Settings</h2>
+        <span class="tag">Advanced</span>
+      </div>
+      <div class="settings-grid">
+        <label>Thread Type
+          <select id="threadTypeSelect">
+            <option value="M8">M8</option>
+            <option value="M10" selected>M10</option>
+            <option value="M12">M12</option>
+          </select>
+        </label>
+        <label>Tolerance (%)
+          <input id="toleranceInput" type="number" min="0" max="100" step="0.1" value="8" />
+        </label>
+        <label>Reference Length (mm)
+          <input id="refLengthInput" type="number" min="0" step="0.01" placeholder="Optional" />
+        </label>
+        <label>Reference Pixels
+          <input id="refPixelsInput" type="number" min="0" step="0.01" placeholder="Optional" />
+        </label>
+      </div>
+      <div class="button-group">
+        <button id="saveSettingsBtn">💾 Save Default Tolerance</button>
+        <button id="exportBtn">📥 Export CSV</button>
+        <button id="performanceBtn">📊 View Performance</button>
+      </div>
+    </section>
+
+    <!-- ANALYTICS SECTION -->
+    <section class="charts card reveal">
+      <div class="section-header">
+        <h2>Inspection Analytics</h2>
+      </div>
+      <div class="chart-grid">
+        <canvas id="passFailChart"></canvas>
+        <canvas id="trendChart"></canvas>
+      </div>
+    </section>
+
+    <!-- RECENT LOGS SECTION -->
+    <section class="logs card reveal">
+      <div class="section-header">
+        <h2>Recent Logs</h2>
+        <button id="refreshLogsBtn" class="btn-small">Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Thread</th>
+              <th>Pitch</th>
+              <th>Diameter</th>
+              <th>AI</th>
+              <th>Final</th>
+              <th>Time (ms)</th>
+            </tr>
+          </thead>
+          <tbody id="logsBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal for Camera Scan Results -->
+  <div id="cameraScanModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Available Cameras</h2>
+      <div id="cameraScanResults"></div>
+    </div>
+  </div>
+
+  <!-- Modal for Performance Metrics -->
+  <div id="performanceModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Performance Metrics</h2>
+      <div id="performanceDetails"></div>
+    </div>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
